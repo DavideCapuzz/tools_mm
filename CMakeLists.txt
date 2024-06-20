@@ -16,13 +16,12 @@ find_package(vision_msgs REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(image_transport REQUIRED)
 find_package(OpenCV REQUIRED)
-find_package(behaviortree_cpp_v3 REQUIRED)
 find_package(behaviortree_ros2 REQUIRED)
+find_package(btcpp_ros2_interfaces REQUIRED)
 find_package(tools_nav REQUIRED)
+find_package(std_srvs REQUIRED)
 
-add_executable(main_BT src/main_BT.cpp)
-add_executable(test_path src/get_path.cpp)
-ament_target_dependencies(test_path
+set(THIS_PACKAGE_DEPS
 rclcpp
 std_msgs 
 geometry_msgs 
@@ -32,39 +31,25 @@ sensor_msgs
 vision_msgs
 rclcpp
 std_msgs
-behaviortree_cpp_v3
 behaviortree_ros2
 tools_nav
+std_srvs
+btcpp_ros2_interfaces
 cv_bridge image_transport OpenCV)
 
-ament_target_dependencies(main_BT
-rclcpp
-std_msgs 
-geometry_msgs 
-actuator_msgs 
-sensor_msgs
-sensor_msgs
-vision_msgs
-rclcpp
-std_msgs
-behaviortree_cpp_v3
-behaviortree_ros2
-cv_bridge image_transport OpenCV)
+add_executable(main_BT
+  src/main_BT.cpp
+  src/get_path.cpp
+  src/get_target.cpp
+  )
+ament_target_dependencies(main_BT ${THIS_PACKAGE_DEPS})
 
 target_include_directories(main_BT PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 target_compile_features(main_BT PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
 
-target_include_directories(test_path PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
-target_compile_features(test_path PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
-
-install(TARGETS test_path
-  DESTINATION lib/${PROJECT_NAME})
-
-install(TARGETS test_path
+install(TARGETS main_BT
   DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)
