@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root BTCPP_format="4" project_name="wheele">
+    <include path="BT.xml"/>
+    <!-- Description of Node Models (used by Groot) -->
+    <TreeNodesModel>
+        <Action ID="GetCone" editable="true">
+            <output_port name="target">ConeNavTarget</output_port>
+        </Action>
+        <Action ID="GetPath" editable="true">
+            <output_port name="path">navPath</output_port>
+            <input_port name="target">navTarget</input_port>
+        </Action>
+        <Action ID="GetTarget" editable="true">
+            <output_port name="target">navTarget</output_port>
+        </Action>
+    </TreeNodesModel>
+</root>

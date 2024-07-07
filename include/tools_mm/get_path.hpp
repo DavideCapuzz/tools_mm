@@ -1,83 +1,54 @@
-#include <behaviortree_ros2/bt_service_node.hpp>
 #include "btcpp_ros2_interfaces/action/sleep.hpp"
-#include "tools_nav/srv/add_three_ints.hpp"
 #include "rclcpp/rclcpp.hpp"
-#include "std_srvs/srv/set_bool.hpp"
+#include <behaviortree_ros2/bt_action_node.hpp>
+#include "geometry_msgs/msg/point.hpp"
+#include <functional>
+#include <future>
+#include <memory>
+#include <string>
+#include <sstream>
 
-class GetPath : public BT::RosServiceNode<tools_nav::srv::AddThreeInts>
+#include "tools_nav/action/get_path.hpp"
+
+//#include "rclcpp_action/rclcpp_action.hpp"
+//#include "rclcpp_components/register_node_macro.hpp"
+
+//using GoalHandleFibonacci = rclcpp_action::ServerGoalHandle<Fibonacci>;
+
+class GetPath: public BT::RosActionNode<tools_nav::action::GetPath>
 {
 public:
-  explicit GetPath(const std::string& name, const BT::NodeConfig& conf,
-                          const BT::RosNodeParams& params)
-    : RosServiceNode<tools_nav::srv::AddThreeInts>(name, conf, params)
-  {
-   RCLCPP_INFO(rclcpp::get_logger("GetPath"), "init");
-  }
-
-  static BT::PortsList providedPorts()
-  {
-    RCLCPP_INFO(rclcpp::get_logger("GetPath"), "providedPorts");
-    return providedBasicPorts({
-        BT::InputPort<unsigned>("A"),
-        BT::InputPort<unsigned>("B"),
-        BT::InputPort<unsigned>("C")});
-  }
-
-  bool setRequest(Request::SharedPtr& request) override;
-
-  BT::NodeStatus onResponseReceived(const Response::SharedPtr& response) override;
-
-  virtual BT::NodeStatus onFailure(BT::ServiceNodeErrorCode error) override;
-
-private:
-  std::string service_suffix_;
-};
-
-
-
-using SetBool = std_srvs::srv::SetBool;
-
-class SetBoolService : public BT::RosServiceNode<SetBool>
-{
-public:
-  explicit SetBoolService(const std::string& name, const BT::NodeConfig& conf,
-                          const BT::RosNodeParams& params)
-    : RosServiceNode<SetBool>(name, conf, params)
+  GetPath(const std::string& name,
+                  const BT::NodeConfig& conf,
+                  const BT::RosNodeParams& params)
+    : BT::RosActionNode<tools_nav::action::GetPath>(name, conf, params)
   {}
 
-  static BT::PortsList providedPorts()
-  {
-    return providedBasicPorts({ BT::InputPort<bool>("value") });
-  }
+  // The specific ports of this Derived class
+  // should be merged with the ports of the base class,
+  // using RosActionNode::providedBasicPorts()
+  static BT::PortsList providedPorts();
 
-  bool setRequest(Request::SharedPtr& request) override;
+  // This is called when the TreeNode is ticked and it should
+  // send the request to the action server
+  bool setGoal(RosActionNode::Goal& goal) override;
+  
+  // Callback executed when the reply is received.
+  // Based on the reply you may decide to return SUCCESS or FAILURE.
+  BT::NodeStatus onResultReceived(const WrappedResult& wr) override;
 
-  BT::NodeStatus onResponseReceived(const Response::SharedPtr& response) override;
-
-  virtual BT::NodeStatus onFailure(BT::ServiceNodeErrorCode error) override;
-
-private:
-  std::string service_suffix_;
-};
-
-//----------------------------------------------
-
-class SetRobotBoolService : public SetBoolService
-{
-public:
-  explicit SetRobotBoolService(const std::string& name, const BT::NodeConfig& conf,
-                               const rclcpp::Node::SharedPtr& node,
-                               const std::string& port_name)
-    : SetBoolService(name, conf, BT::RosNodeParams(node)), service_suffix_(port_name)
-  {}
-
-  static BT::PortsList providedPorts()
-  {
-    return { BT::InputPort<std::string>("robot"), BT::InputPort<bool>("value") };
-  }
-
-  BT::NodeStatus tick() override;
-
-private:
-  std::string service_suffix_;
+  // Callback invoked when there was an error at the level
+  // of the communication between client and server.
+  // This will set the status of the TreeNode to either SUCCESS or FAILURE,
+  // based on the return value.
+  // If not overridden, it will return FAILURE by default.
+  virtual BT::NodeStatus onFailure(BT::ActionNodeErrorCode error) override;
+  // we also support a callback for the feedback, as in
+  // the original tutorial.
+  // Usually, this callback should return RUNNING, but you
+  // might decide, based on the value of the feedback, to abort
+  // the action, and consider the TreeNode completed.
+  // In that case, return SUCCESS or FAILURE.
+  // The Cancel request will be send automatically to the server.
+  BT::NodeStatus onFeedback(const std::shared_ptr<const Feedback> feedback);
 };

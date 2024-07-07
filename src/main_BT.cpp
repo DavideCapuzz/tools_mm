@@ -12,13 +12,7 @@ static const char* xml_text1 = R"(
  )";
 
  static const char* xml_text2 = R"(
- <root BTCPP_format="4">
-     <BehaviorTree>
-        <Sequence>
-            <GetCone name="GetCone"/>
-        </Sequence>
-     </BehaviorTree>
- </root>
+ 
  )";
 
  static const char* xml_text = R"(
@@ -39,30 +33,37 @@ int main(int argc, char** argv)
 {
   rclcpp::init(argc, argv);
   auto nh = std::make_shared<rclcpp::Node>("main_BT");
+  auto global_bb = BT::Blackboard::create();
+  auto maintree_bb = BT::Blackboard::create(global_bb);
 
   BT::BehaviorTreeFactory factory;
 
   // version with default port
   //factory.registerNodeType<GetPath>("GetPath", BT::RosNodeParams(nh, "/add_three_ints"));
   factory.registerNodeType<GetTarget>("GetCone", BT::RosNodeParams(nh, "/get_cone_pos"));
+  factory.registerNodeType<GetTarget>("GetTarget", BT::RosNodeParams(nh, "/get_trg_fnd_pos"));
+  factory.registerNodeType<GetPath>("GetPath", BT::RosNodeParams(nh, "/get_path"));
   // version without default port
 
   // namespace version
   //factory.registerNodeType<SetRobotBoolService>("SetRobotBool", nh, "set_bool");
 
   // version with default port
-  factory.registerNodeType<SetBoolService>("SetBoolA", BT::RosNodeParams(nh, "robotA/"
-                                                                             "set_bool"));
+  //factory.registerNodeType<SetBoolService>("SetBoolA", BT::RosNodeParams(nh, "robotA/" "set_bool"));
 
   // version without default port
-  factory.registerNodeType<SetBoolService>("SetBool", BT::RosNodeParams(nh));
+  //factory.registerNodeType<SetBoolService>("SetBool", BT::RosNodeParams(nh));
 
   // namespace version
-  factory.registerNodeType<SetRobotBoolService>("SetRobotBool", nh, "set_bool");
+  //factory.registerNodeType<SetRobotBoolService>("SetRobotBool", nh, "set_bool");
 
-  auto tree = factory.createTreeFromText(xml_text2);
+  //auto tree = factory.createTreeFromText(xml_text2);
+  auto tree = factory.createTreeFromFile("/home/davide-work/humble_ws/wheele/src/tools_mm/BT.xml", maintree_bb); 
 
-  tree.tickWhileRunning();
+  for(int i = 0; i < 10; i++)
+  {
+    tree.tickWhileRunning();
+  }
 
   return 0;
 }

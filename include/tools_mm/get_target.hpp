@@ -3,6 +3,8 @@
 #include "tools_nav/srv/get_target.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "std_srvs/srv/set_bool.hpp"
+#include "geometry_msgs/msg/point.hpp"
+//#include "tools_mm/bt_utils.hpp"
 
 class GetTarget : public BT::RosServiceNode<tools_nav::srv::GetTarget>
 {
@@ -17,7 +19,7 @@ public:
   static BT::PortsList providedPorts()
   {
     RCLCPP_INFO(rclcpp::get_logger("GetTarget"), "providedPorts");
-    return providedBasicPorts({});
+    return {BT::OutputPort<geometry_msgs::msg::Point>("target")};
   }
 
   bool setRequest(Request::SharedPtr& request) override;
