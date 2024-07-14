@@ -13,7 +13,7 @@ BT::NodeStatus GetTarget::onResponseReceived(const Response::SharedPtr& response
   if(response->result)
   {
     RCLCPP_INFO(rclcpp::get_logger("GetTarget"), "SetBool service succeeded.: %ld", response->result);
-    setOutput("target", response->target );
+    //setOutput("target", response->target );
     if(auto any_ptr = getLockedPortContent("target"))
     {
       // inside this scope (as long as any_ptr exists) the access to
@@ -37,7 +37,7 @@ BT::NodeStatus GetTarget::onResponseReceived(const Response::SharedPtr& response
     else
     {
       return BT::NodeStatus::FAILURE;
-  }
+    }
   }
   else
   {

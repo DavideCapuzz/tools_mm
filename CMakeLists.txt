@@ -42,6 +42,7 @@ add_executable(main_BT
   src/main_BT.cpp
   src/get_path.cpp
   src/get_target.cpp
+  src/execute_path.cpp
   )
 ament_target_dependencies(main_BT ${THIS_PACKAGE_DEPS})
 

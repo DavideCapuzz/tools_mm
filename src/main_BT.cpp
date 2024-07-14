@@ -1,5 +1,6 @@
 #include "tools_mm/get_path.hpp"
 #include "tools_mm/get_target.hpp"
+#include "tools_mm/execute_path.hpp"
 
 static const char* xml_text1 = R"(
  <root BTCPP_format="4">
@@ -41,6 +42,7 @@ int main(int argc, char** argv)
   // version with default port
   //factory.registerNodeType<GetPath>("GetPath", BT::RosNodeParams(nh, "/add_three_ints"));
   factory.registerNodeType<GetTarget>("GetCone", BT::RosNodeParams(nh, "/get_cone_pos"));
+  factory.registerNodeType<ExecutePath>("ExecutePath", BT::RosNodeParams(nh, "/set_path"));
   factory.registerNodeType<GetTarget>("GetTarget", BT::RosNodeParams(nh, "/get_trg_fnd_pos"));
   factory.registerNodeType<GetPath>("GetPath", BT::RosNodeParams(nh, "/get_path"));
   // version without default port
@@ -60,10 +62,12 @@ int main(int argc, char** argv)
   //auto tree = factory.createTreeFromText(xml_text2);
   auto tree = factory.createTreeFromFile("/home/davide-work/humble_ws/wheele/src/tools_mm/BT.xml", maintree_bb); 
 
-  for(int i = 0; i < 10; i++)
+  while (rclcpp::ok())
   {
-    tree.tickWhileRunning();
+      tree.tickWhileRunning();
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
   }
 
+  rclcpp::shutdown();
   return 0;
 }

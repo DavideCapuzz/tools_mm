@@ -6,7 +6,7 @@ BT::PortsList GetPath::providedPorts()
 {
   RCLCPP_INFO(rclcpp::get_logger("GetPath"),"init prots get path");
   return {
-    BT::OutputPort<geometry_msgs::msg::Point>("path"),
+    BT::OutputPort<nav_msgs::msg::Path>("path"),
     BT::InputPort<geometry_msgs::msg::Point>("target")
   };
 }
@@ -27,13 +27,34 @@ bool GetPath::setGoal(RosActionNode::Goal& goal)
 
 BT::NodeStatus GetPath::onResultReceived(const WrappedResult& wr)
   {
-    std::stringstream ss;
-    ss << "Result received: ";
-    for (auto number : wr.result->path.poses) {
-      //ss << number.pose.x << " ";
+   /* for(int i =0; i<wr.result->path_.poses.size(); i++)
+	{
+		RCLCPP_INFO(get_logger(), " distance %f , %f",wr.result->path_.poses[i].pose.position.x, wr.result->path_.poses[i].pose.position.y);
+	}*/
+    if(auto any_ptr = getLockedPortContent("path"))
+    {
+      // inside this scope (as long as any_ptr exists) the access to
+      // the entry in the blackboard is mutex-protected and thread-safe.
+
+      // check if the entry contains a valid element
+      if(any_ptr->empty())
+      {
+        // The entry hasn't been initialized by any other node, yet.
+        // Let's initialize it ourselves
+        any_ptr.assign(wr.result->path);
+        RCLCPP_INFO(rclcpp::get_logger("GetPath"), "SetBool service ok:");
+      }
+      else if(auto* vect_ptr = any_ptr->castPtr<nav_msgs::msg::Path>())
+      {
+        // NOTE: vect_ptr would be nullptr, if we try to cast it to the wrong type
+        vect_ptr = &wr.result->path;
+      }
+      return BT::NodeStatus::SUCCESS;
     }
-    RCLCPP_INFO(rclcpp::get_logger("GetPath"), ss.str().c_str());
-    return BT::NodeStatus::SUCCESS;
+    else
+    {
+      return BT::NodeStatus::FAILURE;
+    }
   }
 
 BT::NodeStatus GetPath::onFailure(BT::ActionNodeErrorCode error)

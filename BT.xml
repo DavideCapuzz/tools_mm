@@ -8,11 +8,16 @@
       </Fallback>
       <GetPath path="{path}"
                target="{target}"/>
+      <ExecutePath path="{path}"/>
     </Sequence>
   </BehaviorTree>
 
   <!-- Description of Node Models (used by Groot) -->
   <TreeNodesModel>
+    <Action ID="ExecutePath"
+            editable="true">
+      <input_port name="path">navpath</input_port>
+    </Action>
     <Action ID="GetCone"
             editable="true">
       <output_port name="target">ConeNavTarget</output_port>
