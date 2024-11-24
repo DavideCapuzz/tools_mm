@@ -4,6 +4,7 @@
 
 BT::PortsList ExecutePath::providedPorts()
 {
+  // initialize blackboard ports
   RCLCPP_INFO(rclcpp::get_logger("ExecutePath"),"init prots get path");
   return {
     BT::InputPort<nav_msgs::msg::Path>("path")
@@ -12,11 +13,9 @@ BT::PortsList ExecutePath::providedPorts()
 
 bool ExecutePath::setGoal(RosActionNode::Goal& goal) 
 {
-  nav_msgs::msg::Path path;
-  // get "order" from the Input port
-  getInput("path", path);
-  
-  RCLCPP_INFO(rclcpp::get_logger("ExecutePath"),"init prots get path %f", path.poses[0].pose.position.x);
+  // get the target from the blackboard
+  nav_msgs::msg::Path path;  
+  getInput("path", path);  
   goal.path = path;
   // return true, if we were able to set the goal correctly.
   return true;
@@ -24,12 +23,7 @@ bool ExecutePath::setGoal(RosActionNode::Goal& goal)
 
 BT::NodeStatus ExecutePath::onResultReceived(const WrappedResult& wr)
 {
-  /*std::stringstream ss;
-  ss << "Result received: ";
-  for (auto number : wr.result->path.poses) {
-    //ss << number.pose.x << " ";
-  }
-  RCLCPP_INFO(rclcpp::get_logger("ExecutePath"), ss.str().c_str());*/
+  // TODO add the check on the result
   return BT::NodeStatus::SUCCESS;
 }
 
@@ -41,6 +35,6 @@ BT::NodeStatus ExecutePath::onFailure(BT::ActionNodeErrorCode error)
 
 BT::NodeStatus ExecutePath::onFeedback(const std::shared_ptr<const Feedback> feedback)
 {
-  //RCLCPP_INFO(rclcpp::get_logger("ExecutePath"), "Publishing: '%s'",feedback->state.data.c_str());
+  // TODO add the check on the feedback
   return BT::NodeStatus::RUNNING;
 }

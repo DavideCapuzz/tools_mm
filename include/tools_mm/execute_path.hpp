@@ -8,20 +8,15 @@
 #include <string>
 #include <sstream>
 
-#include "tools_nav/action/execute_path.hpp"
+#include "interfaces/action/execute_path.hpp"
 
-//#include "rclcpp_action/rclcpp_action.hpp"
-//#include "rclcpp_components/register_node_macro.hpp"
-
-//using GoalHandleFibonacci = rclcpp_action::ServerGoalHandle<Fibonacci>;
-
-class ExecutePath: public BT::RosActionNode<tools_nav::action::ExecutePath>
+class ExecutePath: public BT::RosActionNode<interfaces::action::ExecutePath>
 {
 public:
   ExecutePath(const std::string& name,
                   const BT::NodeConfig& conf,
                   const BT::RosNodeParams& params)
-    : BT::RosActionNode<tools_nav::action::ExecutePath>(name, conf, params)
+    : BT::RosActionNode<interfaces::action::ExecutePath>(name, conf, params)
   {}
 
   // The specific ports of this Derived class

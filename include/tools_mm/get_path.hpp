@@ -8,20 +8,20 @@
 #include <string>
 #include <sstream>
 
-#include "tools_nav/action/get_path.hpp"
+#include "interfaces/action/get_path.hpp"
 
 //#include "rclcpp_action/rclcpp_action.hpp"
 //#include "rclcpp_components/register_node_macro.hpp"
 
 //using GoalHandleFibonacci = rclcpp_action::ServerGoalHandle<Fibonacci>;
 
-class GetPath: public BT::RosActionNode<tools_nav::action::GetPath>
+class GetPath: public BT::RosActionNode<interfaces::action::GetPath>
 {
 public:
   GetPath(const std::string& name,
                   const BT::NodeConfig& conf,
                   const BT::RosNodeParams& params)
-    : BT::RosActionNode<tools_nav::action::GetPath>(name, conf, params)
+    : BT::RosActionNode<interfaces::action::GetPath>(name, conf, params)
   {}
 
   // The specific ports of this Derived class

@@ -4,7 +4,8 @@
 
 BT::PortsList GetPath::providedPorts()
 {
-  RCLCPP_INFO(rclcpp::get_logger("GetPath"),"init prots get path");
+  // initialize blackboard ports
+  RCLCPP_INFO(rclcpp::get_logger("GetPath"),"init ports get path");
   return {
     BT::OutputPort<nav_msgs::msg::Path>("path"),
     BT::InputPort<geometry_msgs::msg::Point>("target")
@@ -13,49 +14,40 @@ BT::PortsList GetPath::providedPorts()
 
 bool GetPath::setGoal(RosActionNode::Goal& goal) 
 {
+  // get the target from the blackboard
   geometry_msgs::msg::Point target;
-  // get "order" from the Input port
-  getInput("target", target);
-  
-  RCLCPP_INFO(rclcpp::get_logger("GetPath"),"init prots get path %f", target.x);
-  goal.target.x=target.x;
-  goal.target.y=target.y;
-  goal.target.z=target.z;
+  getInput("target", target);      
+  goal.target.x = target.x;
+  goal.target.y = target.y;
+  goal.target.z = target.z;
   // return true, if we were able to set the goal correctly.
   return true;
 }
 
 BT::NodeStatus GetPath::onResultReceived(const WrappedResult& wr)
+{
+  // TODO add the check on the result
+  if(auto any_ptr = getLockedPortContent("path"))
   {
-   /* for(int i =0; i<wr.result->path_.poses.size(); i++)
-	{
-		RCLCPP_INFO(get_logger(), " distance %f , %f",wr.result->path_.poses[i].pose.position.x, wr.result->path_.poses[i].pose.position.y);
-	}*/
-    if(auto any_ptr = getLockedPortContent("path"))
+    // check if the exist the lock to the black board target
+    if(any_ptr->empty())
     {
-      // inside this scope (as long as any_ptr exists) the access to
-      // the entry in the blackboard is mutex-protected and thread-safe.
-
-      // check if the entry contains a valid element
-      if(any_ptr->empty())
-      {
-        // The entry hasn't been initialized by any other node, yet.
-        // Let's initialize it ourselves
-        any_ptr.assign(wr.result->path);
-        RCLCPP_INFO(rclcpp::get_logger("GetPath"), "SetBool service ok:");
-      }
-      else if(auto* vect_ptr = any_ptr->castPtr<nav_msgs::msg::Path>())
-      {
-        // NOTE: vect_ptr would be nullptr, if we try to cast it to the wrong type
-        vect_ptr = &wr.result->path;
-      }
-      return BT::NodeStatus::SUCCESS;
+      // The entry hasn't been initialized by any other node, yet.
+      // Let's initialize it ourselves
+      any_ptr.assign(wr.result->path);
     }
-    else
+    else if(auto* vect_ptr = any_ptr->castPtr<nav_msgs::msg::Path>())
     {
-      return BT::NodeStatus::FAILURE;
+      // NOTE: vect_ptr would be nullptr, if we try to cast it to the wrong type
+      * vect_ptr = wr.result->path;
     }
+    return BT::NodeStatus::SUCCESS;
   }
+  else
+  {
+    return BT::NodeStatus::FAILURE;
+  }
+}
 
 BT::NodeStatus GetPath::onFailure(BT::ActionNodeErrorCode error)
 {
@@ -65,6 +57,6 @@ BT::NodeStatus GetPath::onFailure(BT::ActionNodeErrorCode error)
 
 BT::NodeStatus GetPath::onFeedback(const std::shared_ptr<const Feedback> feedback)
 {
-  RCLCPP_INFO(rclcpp::get_logger("GetPath"), "Publishing: '%s'",feedback->state.data.c_str());
+  // TODO add the check on the feedback
   return BT::NodeStatus::RUNNING;
 }

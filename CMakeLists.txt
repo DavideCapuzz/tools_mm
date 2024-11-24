@@ -19,6 +19,7 @@ find_package(OpenCV REQUIRED)
 find_package(behaviortree_ros2 REQUIRED)
 find_package(btcpp_ros2_interfaces REQUIRED)
 find_package(tools_nav REQUIRED)
+find_package(interfaces REQUIRED)
 find_package(std_srvs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
@@ -35,6 +36,7 @@ std_msgs
 behaviortree_ros2
 tools_nav
 std_srvs
+interfaces
 btcpp_ros2_interfaces
 cv_bridge image_transport OpenCV)
 
