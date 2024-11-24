@@ -13,7 +13,7 @@ BT::NodeStatus GetTarget::onResponseReceived(const Response::SharedPtr& response
   // check if we have received the result
   if(response->result)
   { 
-    // check if the it existe the lock to the black board target
+    // check if the exist the lock to the black board target
     if(auto any_ptr = getLockedPortContent("target"))
     {      
       // the entry in the blackboard is mutex-protected and thread-safe.

@@ -10,11 +10,6 @@
 
 #include "interfaces/action/get_path.hpp"
 
-//#include "rclcpp_action/rclcpp_action.hpp"
-//#include "rclcpp_components/register_node_macro.hpp"
-
-//using GoalHandleFibonacci = rclcpp_action::ServerGoalHandle<Fibonacci>;
-
 class GetPath: public BT::RosActionNode<interfaces::action::GetPath>
 {
 public:
